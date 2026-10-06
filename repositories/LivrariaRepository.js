@@ -1,5 +1,7 @@
 const fs = require('fs');
 const path = require('path');
+const bcrypt = require('bcrypt');
+const { BCRYPT_SALT_ROUNDS } = require('../config/security');
 
 class LivrariaRepository {
   constructor() {
@@ -9,10 +11,14 @@ class LivrariaRepository {
   }
 
   _obterDadosPadrao() {
+    // Senhas de seed nunca ficam em texto puro no banco: são convertidas em hash BCrypt
+    const senhaAdmin = process.env.SEED_ADMIN_PASSWORD || 'Admin@123';
+    const senhaLeitor = process.env.SEED_USER_PASSWORD || 'Leitor@123';
+
     return {
       usuarios: [
-        { id: 1, nome: "Admin", email: "admin@livraria.com", senha_hash: "$2b$10$9v3m0C1O6mK9BqV3j0Xg9.1fG/3zR1i5e.7F6o4D1u1G2H3J4K5L6", role: "ADMIN" },
-        { id: 2, nome: "Leitor", email: "leitor@gmail.com", senha_hash: "$2b$10$9v3m0C1O6mK9BqV3j0Xg9.1fG/3zR1i5e.7F6o4D1u1G2H3J4K5L6", role: "USER" }
+        { id: 1, nome: "Admin", email: "admin@livraria.com", senha_hash: bcrypt.hashSync(senhaAdmin, BCRYPT_SALT_ROUNDS), role: "ADMIN" },
+        { id: 2, nome: "Leitor", email: "leitor@gmail.com", senha_hash: bcrypt.hashSync(senhaLeitor, BCRYPT_SALT_ROUNDS), role: "USER" }
       ],
       autores: [
         { id: 1, nome: "Machado de Assis", nacionalidade: "Brasileiro" }
@@ -24,7 +30,7 @@ class LivrariaRepository {
           ano: 1899,
           autor_id: 1,
           comentarios: [
-            { id: 1, autor_nome: "Leitor", texto: "Clássico indispensável." }
+            { id: 1, usuario_id: 2, autor_nome: "Leitor", texto: "Clássico indispensável." }
           ]
         }
       ]
@@ -63,7 +69,8 @@ class LivrariaRepository {
   // Métodos de Usuários
   buscarUsuarioPorEmail(email) {
     const db = this.carregar();
-    return db.usuarios.find(u => u.email === email) || null;
+    const alvo = String(email).trim().toLowerCase();
+    return db.usuarios.find(u => u.email.toLowerCase() === alvo) || null;
   }
 
   salvarUsuario(usuario) {
