@@ -1,3 +1,4 @@
+require('./config/security'); // carrega .env e valida JWT_SECRET antes de tudo
 const express = require('express');
 const cors = require('cors');
 
@@ -7,10 +8,12 @@ const autorRoutes = require('./routes/autorRoutes');
 const errorHandler = require('./middlewares/errorMiddleware');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
+
+app.disable('x-powered-by');
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '10kb' }));
 
 // Agrupamento Semântico de Rotas (RESTful /api/v1)
 app.use('/api/v1/auth', authRoutes);
