@@ -6,7 +6,7 @@ class AutorService {
   }
 
   criar({ nome, nacionalidade }) {
-    if (!nome || nome.trim() === "") {
+    if (!nome || typeof nome !== 'string' || nome.trim() === "") {
       throw { status: 400, message: "O nome do autor é obrigatório." };
     }
 

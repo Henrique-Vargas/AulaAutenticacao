@@ -28,7 +28,7 @@ class LivroService {
   }
 
   criar({ titulo, ano, autor_id }) {
-    if (!titulo || !autor_id) {
+    if (!titulo || typeof titulo !== 'string' || !autor_id) {
       throw { status: 400, message: "O título e o autor_id são obrigatórios." };
     }
 
@@ -45,15 +45,19 @@ class LivroService {
   }
 
   adicionarComentario(livroId, { texto, usuario }) {
-    if (!texto || texto.trim() === "") {
+    if (!usuario) {
+      throw { status: 401, message: "Usuário não autenticado." };
+    }
+    if (typeof texto !== 'string' || texto.trim() === "") {
       throw { status: 400, message: "O texto do comentário não pode estar vazio." };
     }
 
     this.buscarPorId(livroId);
 
     return repository.adicionarComentario(livroId, {
-      autor_nome: usuario ? usuario.nome : "Anônimo",
-      texto: texto.trim()
+      usuario_id: usuario.id,
+      autor_nome: usuario.nome,
+      texto: texto.trim().slice(0, 1000)
     });
   }
 }
