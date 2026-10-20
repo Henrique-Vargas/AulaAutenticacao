@@ -32,10 +32,15 @@ As senhas podem ser trocadas por `SEED_ADMIN_PASSWORD` / `SEED_USER_PASSWORD` no
 
 ## Matriz de permissões
 
+> Documentação interativa (Swagger UI) em `http://localhost:3000/docs` e especificação OpenAPI
+> em JSON em `http://localhost:3000/docs/api.json`. Para testar rotas protegidas: faça login em
+> `POST /auth/login` pelo próprio Swagger, copie o `token` e cole no botão **Authorize**.
+
 | Método | Rota                              | Acesso                 | Sucesso | Falha de segurança |
 |--------|-----------------------------------|------------------------|---------|--------------------|
 | GET    | `/api/v1/livros`                  | Público                | 200     | —                  |
 | GET    | `/api/v1/livros/:id`              | Público                | 200     | —                  |
+| GET    | `/api/v1/autores`                 | Público                | 200     | —                  |
 | POST   | `/api/v1/auth/register`           | Público                | 201     | —                  |
 | POST   | `/api/v1/auth/login`              | Público                | 200     | 401                |
 | POST   | `/api/v1/livros/:id/comentarios`  | Autenticado (USER/ADMIN) | 201   | 401                |
